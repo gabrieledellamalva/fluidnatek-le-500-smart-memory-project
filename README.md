@@ -2,15 +2,17 @@
 
 # Fluidnatek LE-500 Smart Memory
 
-**An experimental knowledge and decision-support platform for electrospinning R&D.**
+**An industrial R&D software platform for structured electrospinning experiments, historical process intelligence and evidence-based engineering decisions.**
 
 **React 19 · TypeScript · Vite · Node.js · Local-first persistence · Firestore adapter · Gemini API**
 
-*Structured experiments · Historical similarity · Explainable process windows · Traceability*
+*Adaptive Excel ingestion · Typed process data · Deterministic similarity retrieval · Explainable parameter windows*
 
 </div>
 
-![Verified Smart Memory architecture](docs/images/system-overview.svg)
+![Fluidnatek LE-500 Smart Memory — verified workflow](docs/images/system-overview.svg)
+
+> **Engineering scope:** local-first experimental knowledge management and decision support. No live LE-500 telemetry, autonomous machine control or scientifically validated predictive ML model is claimed.
 
 ## Why this exists
 
