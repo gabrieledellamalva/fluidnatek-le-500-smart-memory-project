@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1380" height="570" viewBox="0 0 1380 570" role="img" aria-labelledby="title desc">
+<title id="title">Fluidnatek Smart Memory — Verified engineering workflow</title>
+<desc id="desc">Experimental data is imported and reviewed, normalized into domain models, compared with historical runs, and used for evidence-based process recommendations. Cloud persistence and AI are optional adapters; live machine telemetry is not yet implemented.</desc>
+<defs>
+  <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#0B1429"/><stop offset="1" stop-color="#132C3F"/></linearGradient>
+  <linearGradient id="accent" x1="0" x2="1"><stop stop-color="#5EEAD4"/><stop offset="1" stop-color="#60A5FA"/></linearGradient>
+  <filter id="shadow" x="-20%" y="-25%" width="150%" height="165%"><feDropShadow dx="0" dy="12" stdDeviation="15" flood-color="#000" flood-opacity=".22"/></filter>
+</defs>
+<rect width="1380" height="570" rx="28" fill="url(#bg)"/>
+<circle cx="1290" cy="38" r="205" fill="#1D6C7E" opacity=".13"/><circle cx="65" cy="540" r="240" fill="#396EAB" opacity=".12"/>
+<text x="48" y="65" font-family="Arial,Helvetica,sans-serif" font-size="17" letter-spacing="4" font-weight="700" fill="#5EEAD4">FLUIDNATEK / ENGINEERING WORKFLOW</text>
+<text x="48" y="115" font-family="Arial,Helvetica,sans-serif" font-size="37" font-weight="700" fill="#F2F8FF">Experimental knowledge → evidence-based decisions</text>
+<text x="48" y="148" font-family="Arial,Helvetica,sans-serif" font-size="19" fill="#A9C2D4">Local-first application · typed data · deterministic historical analysis</text>
+<g font-family="Arial,Helvetica,sans-serif" filter="url(#shadow)">
+  <rect x="45" y="199" width="226" height="219" rx="19" fill="#183248" stroke="#426378"/>
+  <rect x="45" y="199" width="226" height="7" rx="3" fill="#5EEAD4"/>
+  <text x="66" y="249" font-size="16" font-weight="700" fill="#5EEAD4">01 / INGEST</text>
+  <text x="66" y="281" font-size="22" font-weight="700" fill="#F4FAFF">Excel &amp; setpoints</text>
+  <text x="66" y="319" font-size="16" fill="#CDDAE6">Workbook parsing</text>
+  <text x="66" y="346" font-size="16" fill="#CDDAE6">Operator inputs</text>
+  <text x="66" y="382" font-size="14" fill="#94B1C3">Review before persist</text>
+  <rect x="318" y="199" width="226" height="219" rx="19" fill="#183248" stroke="#426378"/>
+  <rect x="318" y="199" width="226" height="7" rx="3" fill="#6BB6F8"/>
+  <text x="339" y="249" font-size="16" font-weight="700" fill="#88C5FA">02 / STRUCTURE</text>
+  <text x="339" y="281" font-size="22" font-weight="700" fill="#F4FAFF">Canonical models</text>
+  <text x="339" y="319" font-size="16" fill="#CDDAE6">Project · Formulation</text>
+  <text x="339" y="346" font-size="16" fill="#CDDAE6">Setup · Experiment</text>
+  <text x="339" y="382" font-size="14" fill="#94B1C3">Typed TypeScript domain</text>
+  <rect x="591" y="199" width="226" height="219" rx="19" fill="#183248" stroke="#426378"/>
+  <rect x="591" y="199" width="226" height="7" rx="3" fill="#A7BAFA"/>
+  <text x="612" y="249" font-size="16" font-weight="700" fill="#B4C2FE">03 / RETRIEVE</text>
+  <text x="612" y="281" font-size="22" font-weight="700" fill="#F4FAFF">Historical memory</text>
+  <text x="612" y="319" font-size="16" fill="#CDDAE6">Combined filters</text>
+  <text x="612" y="346" font-size="16" fill="#CDDAE6">Similar run search</text>
+  <text x="612" y="382" font-size="14" fill="#94B1C3">Legacy-aware data views</text>
+  <rect x="864" y="199" width="226" height="219" rx="19" fill="#183248" stroke="#426378"/>
+  <rect x="864" y="199" width="226" height="7" rx="3" fill="#5EEAD4"/>
+  <text x="885" y="249" font-size="16" font-weight="700" fill="#5EEAD4">04 / ANALYZE</text>
+  <text x="885" y="281" font-size="22" font-weight="700" fill="#F4FAFF">Process windows</text>
+  <text x="885" y="319" font-size="16" fill="#CDDAE6">Grade 4 evidence</text>
+  <text x="885" y="346" font-size="16" fill="#CDDAE6">Median / IQR ranges</text>
+  <text x="885" y="382" font-size="14" fill="#94B1C3">Confidence from data</text>
+  <rect x="1137" y="199" width="198" height="219" rx="19" fill="#183248" stroke="#426378"/>
+  <rect x="1137" y="199" width="198" height="7" rx="3" fill="#F8BD76"/>
+  <text x="1158" y="249" font-size="16" font-weight="700" fill="#F8BD76">05 / DECIDE</text>
+  <text x="1158" y="281" font-size="22" font-weight="700" fill="#F4FAFF">Engineer review</text>
+  <text x="1158" y="319" font-size="16" fill="#CDDAE6">Inspect evidence</text>
+  <text x="1158" y="346" font-size="16" fill="#CDDAE6">Save outcomes</text>
+  <text x="1158" y="382" font-size="14" fill="#94B1C3">Human decision maker</text>
+</g>
+<g fill="none" stroke="#69B6C8" stroke-width="3" stroke-linecap="round"><path d="M280 307 h25"/><path d="M553 307 h25"/><path d="M826 307 h25"/><path d="M1099 307 h25"/></g>
+<g fill="#69B6C8"><path d="M305 301 l10 6 -10 6z"/><path d="M578 301 l10 6 -10 6z"/><path d="M851 301 l10 6 -10 6z"/><path d="M1124 301 l10 6 -10 6z"/></g>
+<path d="M46 455 H1334" stroke="#35566B"/>
+<g font-family="Arial,Helvetica,sans-serif" font-size="16">
+<text x="49" y="494" fill="#ECF5FB" font-weight="700">PERSISTENCE</text><text x="187" y="494" fill="#AEC3D2">Local-first + Firestore adapter</text>
+<text x="568" y="494" fill="#ECF5FB" font-weight="700">AI</text><text x="607" y="494" fill="#AEC3D2">Optional Gemini backend</text>
+<text x="933" y="494" fill="#ECF5FB" font-weight="700">LIVE DATA</text><text x="1046" y="494" fill="#F8BD76">Not connected</text>
+<text x="48" y="538" font-size="15" fill="#7F9FB2">Engineering prototype · Recommendations are decision support, not validated process guarantees</text>
+</g>
+</svg>
