@@ -1,561 +1,117 @@
+<div align="center">
+
 # Fluidnatek LE-500 Smart Memory
 
-<p align="center">
-  <strong>Industrial knowledge platform for electrospinning process optimization</strong>
-</p>
+**An experimental knowledge and decision-support platform for electrospinning R&D.**
 
-<p align="center">
-  React · TypeScript · Firebase · Firestore · Google Gemini · Adaptive Excel Import
-</p>
+**React 19 · TypeScript · Vite · Node.js · Local-first persistence · Firestore adapter · Gemini API**
 
-<p align="center">
-  <img src="docs/images/dashboard.png" alt="Fluidnatek LE-500 Smart Memory dashboard" width="100%">
-</p>
+*Structured experiments · Historical similarity · Explainable process windows · Traceability*
 
----
+</div>
 
-## Overview
+![Verified Smart Memory architecture](docs/images/system-overview.svg)
 
-**Fluidnatek LE-500 Smart Memory** is an industrial SaaS platform designed for companies and laboratories working with Fluidnatek electrospinning systems.
+## Why this exists
 
-The platform centralizes projects, formulations, machine setups, experimental runs, telemetry, process results and historical knowledge in a persistent cloud database. Its purpose is to transform isolated experiment files into structured, reusable process intelligence.
+Electrospinning teams accumulate process knowledge across spreadsheets, individual experiments and inconsistent material descriptions. **Smart Memory** brings projects, formulations, hardware setups and run outcomes into one typed workflow, allowing engineers to compare previous experiments before selecting parameters for another run.
 
-The product is being developed as a long-term industrial platform, not as a disposable prototype.
+This is an **engineering prototype / R&D decision-support tool**, not a validated machine controller or a fully deployed industrial SaaS.
 
----
+## What it does
 
-## Product Goals
+| Capability | Implementation |
+|---|---|
+| **Experimental records** | Organizes projects, raw materials, formulations, setups and process runs using typed domain models |
+| **Historical search** | Combined filters across historical experiments, with explicit handling of missing legacy fields |
+| **Similarity analysis** | Deterministic comparisons of relevant previous runs |
+| **Evidence-based recommendations** | Derives parameter windows from similar **Grade 4** historical runs, using median and interquartile ranges (25th–75th percentiles); requires at least three sources by default |
+| **Adaptive spreadsheet parsing** | Reads heterogeneous Excel workbooks, resolves fields and validates imported data; review is required before persistence |
+| **Process setup** | Distinguishes hardware configuration from process setpoints, including separate **HV+** and **HV−** |
+| **Persistence** | Local-first runtime, with typed repositories and an isolated Firestore adapter |
+| **AI integration** | Optional Gemini-backed assistance; AI responses must be treated as suggestions, not validated manufacturing parameters |
 
-Fluidnatek LE-500 Smart Memory is designed to:
-
-- preserve experimental knowledge across users, computers and sessions;
-- standardize heterogeneous Excel files into canonical data models;
-- search historical experiments before starting a new run;
-- identify successful process windows;
-- support engineers with AI-assisted recommendations;
-- reduce repeated failed experiments;
-- provide traceability for projects, formulations, setups and results;
-- prepare the software foundation for future Fluidnatek LE-500 machine integration.
-
----
-
-## Current Capabilities
-
-### Local application and persistence
-
-The application runs locally in the browser, while typed repositories persist data to
-Firestore when Firebase is configured. A local persistence adapter remains available
-for offline compatibility and future desktop packaging; it is not a substitute for
-the configured Firestore source of truth.
-
-### Adaptive Excel Import Engine
-
-The import engine is designed to avoid fixed-template assumptions.
-
-It does not require:
-
-- fixed header positions;
-- fixed sheet names;
-- fixed columns;
-- fixed workbook templates.
-
-The import pipeline is divided into independent modules:
+## Product workflow
 
 ```text
-Excel Workbook
-      │
-      ▼
-Extractor
-      │
-      ▼
-Resolver
-      │
-      ▼
-Normalizer
-      │
-      ▼
-Validator
-      │
-      ▼
-Learning + Confidence
-      │
-      ▼
-Canonical Models
-      │
-      ▼
-Firestore
+Project → Formulation → Machine setup → Operator setpoints
+                        ↓
+              Search historical runs
+                        ↓
+          Similarity + Grade 4 evidence
+                        ↓
+          Median / IQR parameter windows
+                        ↓
+           Engineer review → Save run
 ```
 
-### Smart historical memory
+The current **Live Telemetry & Smart Memory** view uses **operator-entered setpoints**. It does **not** stream measured values from an LE-500 or DataHub device.
 
-The platform maintains structured knowledge about:
-
-- projects;
-- materials;
-- formulations;
-- machine setups;
-- process parameters;
-- telemetry;
-- experiment outcomes;
-- learned aliases;
-- historical process behavior.
-
-### AI-assisted process analysis
-
-Google Gemini is integrated through the backend for process suggestions and telemetry analysis.
-
-The production workflow is being adjusted so that AI calls are explicitly triggered by the operator instead of being executed automatically during navigation. This prevents unnecessary quota usage and keeps the application usable when external AI services are temporarily unavailable.
-
-### Modular enterprise architecture
-
-The codebase separates application responsibilities into dedicated modules:
+## Technical architecture
 
 ```text
 src/
-├── application/      # Use cases, orchestration and mappers
-├── components/       # React UI components
-├── config/           # Application configuration
-├── core/             # Import and domain engine
-├── hooks/            # React state integration
-├── lib/              # Firebase and shared libraries
-├── migrations/       # Controlled historical migrations
-├── repositories/     # Firestore repositories
-├── services/         # Infrastructure services
-├── utils/            # Focused reusable utilities
-└── types.ts          # Application-facing types
+├── application/       Use cases, orchestration, mappings
+├── core/              Excel ingestion and domain logic
+├── components/        React screens and interactive workflow
+├── features/          Historical / experimental assistant logic
+├── repositories/      Typed persistence boundaries
+├── services/          Infrastructure integrations
+├── lib/               Shared adapters and utilities
+├── migrations/        Historical data migration tooling
+└── types.ts           Application-facing types
+
+server.ts              Node / Express backend, optional AI integration
 ```
 
----
+**Import pipeline:** workbook extraction → semantic resolution → normalization → validation → confidence / review → canonical models.
 
-## Core Engine Responsibilities
+**Recommendation logic:** similar experiment selection → Grade 4 evidence → median and 25th–75th percentile parameter windows → evidence and confidence shown to the operator.
 
-The adaptive import engine follows strict module boundaries.
+A clear boundary separates **measured data**, **manual setpoints**, **historical evidence** and **AI suggestions**. No machine-telemetry integration or closed-loop parameter control is claimed.
 
-| Module           | Responsibility                                                  |
-| ---------------- | --------------------------------------------------------------- |
-| `extractor`    | Reads Excel workbooks and produces raw extracted structures     |
-| `resolver`     | Recognizes the semantic meaning of sheets, fields and values    |
-| `normalizer`   | Converts heterogeneous input into canonical domain models       |
-| `validator`    | Verifies completeness, consistency and import quality           |
-| `dictionaries` | Provides semantic and parameter dictionaries                    |
-| `learning`     | Stores newly learned aliases, materials and parameter knowledge |
-| `confidence`   | Calculates confidence scores for semantic decisions             |
-| `pipeline`     | Coordinates the complete ingestion flow                         |
-| `report`       | Produces import, validation and learning reports                |
-| `types`        | Defines canonical domain structures                             |
+## Screenshots
 
-This separation must remain intact as the product evolves.
+The diagram above depicts the verified software architecture. **Actual application screenshots will be added from the running React build** after review for confidential laboratory data. This README deliberately does not present Google AI Studio, mockups or stock dashboards as real product screenshots.
 
----
+## Run locally
 
-## Technology Stack
-
-### Frontend
-
-- React
-- Vite
-- TypeScript
-- Modern responsive CSS
-- Component-based UI architecture
-
-### Backend and infrastructure
-
-- Node.js
-- Express
-- Firebase
-- Firestore
-- Firebase Authentication
-- Google Gemini API
-
-### Data processing
-
-- Adaptive Excel parsing
-- Semantic field resolution
-- Canonical normalization
-- Confidence scoring
-- Historical learning
-- Controlled migration tools
-
----
-
-## Database adapter
-
-Firestore is the current persistent backend. Repository interfaces isolate storage so
-a future relational adapter such as MySQL can be introduced without rewriting the UI
-or domain engine. No database migration is performed automatically.
-
-Firebase configuration is supplied through environment variables. Secrets and environment-specific identifiers must not be committed to the repository.
-
-Expected frontend variables:
-
-```env
-VITE_FIREBASE_API_KEY=
-VITE_FIREBASE_AUTH_DOMAIN=
-VITE_FIREBASE_PROJECT_ID=
-VITE_FIREBASE_STORAGE_BUCKET=
-VITE_FIREBASE_MESSAGING_SENDER_ID=
-VITE_FIREBASE_APP_ID=
-```
-
-Expected backend variables:
-
-```env
-GEMINI_API_KEY=
-APP_URL=
-```
-
-The configured Firebase project can be opened from the Firebase Console by selecting the project associated with `VITE_FIREBASE_PROJECT_ID`.
-
-Do not place private API keys, service-account files or production secrets in this README.
-
----
-
-## Local Development
-
-### Prerequisites
-
-- Node.js 20 or newer
-- npm
-- A Firebase project
-- A Firestore database
-- A valid Gemini API key
-
-### Installation
+**Requirements:** Node.js 20+, npm. An `.env` is needed only for integrations enabled in your environment.
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/gabrieledellamalva06-coding/fluidnatek-le-500-smart-memory-project.git
 cd fluidnatek-le-500-smart-memory-project
-npm install
-```
-
-### Environment configuration
-
-Create a local `.env` file in the project root:
-
-```env
-VITE_FIREBASE_API_KEY=your_value
-VITE_FIREBASE_AUTH_DOMAIN=your_value
-VITE_FIREBASE_PROJECT_ID=your_value
-VITE_FIREBASE_STORAGE_BUCKET=your_value
-VITE_FIREBASE_MESSAGING_SENDER_ID=your_value
-VITE_FIREBASE_APP_ID=your_value
-
-GEMINI_API_KEY=your_value
-APP_URL=http://localhost:3000
-```
-
-Never commit the real `.env` file.
-
-### Start the development environment
-
-```bash
+npm ci
+cp .env.example .env
 npm run dev
 ```
 
-Open the local URL shown by Vite in the terminal.
+Open the URL displayed by the development server. The example environment file documents available configuration variables. **Never commit production keys, laboratory identifiers or customer records.**
 
-### TypeScript validation
+**Verification**
 
 ```bash
 npm run lint
-```
-
-### Production build
-
-```bash
+npm test
 npm run build
 ```
 
----
+## Current boundaries
 
-## Gemini Quota Behavior
+- Spreadsheet parsing and validation exist, but the import UI does **not** automatically commit arbitrary Excel rows to Firestore.
+- Local-first storage and historical records are available; Firestore is an isolated adapter, not a compulsory online runtime.
+- Historical filtering is currently in-memory and is not intended as an unlimited-scale query engine.
+- No real-time machine signals, DataHub connection, automatic parameter control or scientifically validated predictive ML model are claimed.
+- Production-grade organization isolation, authorization and audit controls need further engineering before enterprise use.
 
-A Gemini response with HTTP status `429` and code `QUOTA_EXCEEDED` means that the Google AI project has reached an active usage limit.
+See [implementation status](docs/IMPLEMENTATION_STATUS.md) for the detailed implementation and limitations, [operator guide](docs/USER_GUIDE.md) for the workflow, and [roadmap](ROADMAP.md) for future work.
 
-The current backend uses retry logic with exponential delays. The final production behavior will distinguish between:
+## Collaboration and provenance
 
-- temporary rate limits, which may be retried;
-- exhausted quota, which should stop immediately;
-- unavailable AI, which should activate deterministic historical-memory fallback logic.
+The commit history includes work attributed to **Dilara Badur** as well as the repository owner. GitHub's automatic Contributors panel depends on commits being associated with verified GitHub accounts; access as a repository collaborator alone does not grant contributor attribution.
 
-Planned interaction model:
+Additional contributor credits should be added only with confirmed identities and consent. Please refer to the Git history for code-level attribution.
 
-```text
-Open application
-      │
-      └── No Gemini request
+## Ownership
 
-Select project or experiment
-      │
-      └── No Gemini request
-
-Press "Generate AI Recommendation"
-      │
-      └── One controlled Gemini request
-
-Gemini unavailable
-      │
-      └── Historical Smart Memory fallback
-```
-
-The application must remain operational even when Gemini is unavailable.
-
----
-
-## UX Fusion: Smart Memory 2.0
-
-### Scheduled implementation window
-
-**Tomorrow, 08:00–11:00**
-
-The next major milestone is the complete fusion of two existing Fluidnatek applications.
-
-### Source A — Fluidnatek LE-500 Smart Memory
-
-Provides the scalable technical foundation:
-
-- React and TypeScript;
-- Firestore persistence;
-- repositories and application services;
-- adaptive Excel import;
-- canonical data models;
-- learning and confidence modules;
-- Gemini backend integration;
-- migration and traceability infrastructure.
-
-### Source B — Fluidnatek AI Process Assistant
-
-Provides the proven laboratory workflow:
-
-- project-first navigation;
-- materials and formulations management;
-- setup selection;
-- experimental run workflow;
-- memory search before saving a run;
-- historical similarity analysis;
-- recommended process windows;
-- expected processability and fiber diameter;
-- warning and engineer-comment presentation.
-
-### Fusion strategy
-
-The Python/Streamlit application will not overwrite the React application.
-
-Its workflow and usability will be recreated in React while preserving the existing Smart Memory architecture.
-
-```text
-Fluidnatek AI Process Assistant
-        │
-        ├── Laboratory workflow
-        ├── Page sequence
-        ├── Search Memory interaction
-        ├── Decision support
-        └── Operator usability
-        │
-        ▼
-Controlled React UX Port
-        │
-        ▼
-Fluidnatek LE-500 Smart Memory
-        │
-        ├── Firestore
-        ├── Core Engine
-        ├── Repositories
-        ├── Application Services
-        ├── Adaptive Excel Import
-        ├── Historical Learning
-        └── Gemini Integration
-        │
-        ▼
-Fluidnatek Smart Memory 2.0
-```
-
-### Planned workflow
-
-```text
-Home
-  │
-  ▼
-Project
-  │
-  ▼
-Formulation
-  │
-  ▼
-Machine Setup
-  │
-  ▼
-Critical Process Parameters
-  │
-  ▼
-Search Historical Memory
-  │
-  ▼
-Historical Analysis
-  │
-  ▼
-Optional AI Recommendation
-  │
-  ▼
-Save Experimental Run
-  │
-  ▼
-Results and Continuous Learning
-```
-
-### Planned deliverables for the fusion session
-
-- workflow-driven application shell;
-- simplified sidebar and navigation;
-- new experiment wizard;
-- dedicated Search Memory page;
-- historical similarity results;
-- expected processability metrics;
-- recommended successful process window;
-- warnings for out-of-range parameters;
-- historical engineer comments;
-- manual AI recommendation trigger;
-- deterministic fallback when Gemini quota is unavailable;
-- connection of the new workflow to existing Firestore services;
-- preservation of all current domain and import-engine modules.
-
-### Architectural rule
-
-The fusion is a **UI and workflow migration**, not a destructive rewrite.
-
-The following areas remain authoritative and must not be replaced by the reference application:
-
-```text
-src/core/
-src/application/
-src/repositories/
-src/services/
-src/migrations/
-Firestore configuration
-Canonical TypeScript domain models
-```
-
----
-
-## Product Roadmap
-
-### Implemented foundation
-
-- [X] React + Vite + TypeScript application
-- [X] Firebase initialization
-- [X] Firestore repositories
-- [X] Project persistence
-- [X] Formulation persistence
-- [X] Experiment persistence
-- [X] Adaptive import Core Engine
-- [X] Learning and confidence modules
-- [X] Historical migration tooling
-- [X] Gemini backend integration
-- [X] TypeScript validation workflow
-
-### Immediate milestone
-
-- [ ] Smart Memory 2.0 UX Fusion
-- [ ] Workflow-based experiment creation
-- [ ] Search Memory interface
-- [ ] Manual AI request control
-- [ ] Quota-safe AI fallback
-- [ ] Unified results center
-
-### Subsequent milestones
-
-- [ ] Enterprise authentication and authorization
-- [ ] Organization and tenant isolation
-- [ ] Audit history
-- [ ] Advanced semantic search
-- [ ] Versioned formulations
-- [ ] Experiment comparison workspace
-- [ ] Advanced reporting and PDF export
-- [ ] Real-time LE-500 integration
-- [ ] Telemetry ingestion through WebSocket, SSE or MQTT
-- [ ] Production monitoring and observability
-- [ ] Automated testing and CI/CD
-- [ ] Multi-environment deployment strategy
-
----
-
-## Current Project Status
-
-The code-verified status and current limitations are maintained in
-[`docs/IMPLEMENTATION_STATUS.md`](docs/IMPLEMENTATION_STATUS.md). In particular, Excel
-Firestore persistence and real DataHub telemetry are not yet production-connected.
-
-| Area                       | Status                                    |
-| -------------------------- | ----------------------------------------- |
-| Core architecture          | Implemented                               |
-| Firestore persistence      | Implemented                               |
-| Adaptive Excel engine      | Implemented                               |
-| Historical migration       | Implemented                               |
-| Gemini integration         | Implemented, quota-control update pending |
-| Current user interface     | Operational                               |
-| Smart Memory 2.0 UX Fusion | Scheduled                                 |
-| Direct LE-500 integration  | Planned                                   |
-
----
-
-## Development Principles
-
-- Architecture quality takes priority over coding speed.
-- Existing behavior must remain compatible.
-- Destructive refactoring is forbidden.
-- Each module must have one clear responsibility.
-- Composition is preferred over monolithic classes.
-- TypeScript must remain strictly typed.
-- `any` is prohibited except in explicitly justified edge cases.
-- Firestore is the persistent source of truth.
-- Excel templates must never be assumed to have fixed structures.
-- New functionality must be implemented incrementally and validated with zero TypeScript errors.
-
----
-
-## Security
-
-- Never commit `.env` files.
-- Never commit Firebase service-account credentials.
-- Never expose Gemini API keys in the frontend.
-- Never publish production Firestore rules without review.
-- Use least-privilege access for Firebase and deployment accounts.
-- Validate all imported data before persistence.
-
----
-
-## Documentation
-
-Recommended project documentation:
-
-```text
-README.md
-CHANGELOG.md
-ROADMAP.md
-RELEASE_CHECKLIST.md
-.env.example
-CLAUDE.md
-docs/
-└── images/
-    └── dashboard.png
-```
-
-See [`docs/USER_GUIDE.md`](docs/USER_GUIDE.md) for installation, the operator workflow,
-Excel import, Firestore collections and verification commands. See
-[`docs/IMPLEMENTATION_STATUS.md`](docs/IMPLEMENTATION_STATUS.md) for verified limits.
-
----
-
-## License and Ownership
-
-This repository contains proprietary work for the Fluidnatek LE-500 Smart Memory initiative.
-
-All product names, technical assets, process knowledge and associated documentation remain subject to the ownership and licensing terms defined by the project stakeholders.
-
----
-
-## Project Vision
-
-Fluidnatek LE-500 Smart Memory is intended to become a durable industrial knowledge layer for electrospinning operations.
-
-The final platform will connect experimental history, adaptive import, process telemetry, operator decisions and AI-assisted optimization into one traceable system that improves continuously as new experiments are performed.
+Project-specific code, industrial data and branding may be subject to separate stakeholder agreements. Public visibility of this repository does **not** imply permission to reuse confidential process data or trademarks. Review relevant ownership and licensing terms before redistribution.
