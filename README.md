@@ -10,7 +10,9 @@
 
 </div>
 
-![Fluidnatek LE-500 Smart Memory — verified workflow](docs/images/system-overview.svg)
+<div align="center">
+  <img src="docs/images/fluidnatek_workflow_black_premium%20%283%29.jpg" alt="Fluidnatek LE-500 Smart Memory — premium electrospinning R&D workflow illustration" width="100%" />
+</div>
 
 > **Engineering scope:** local-first experimental knowledge management and decision support. No live LE-500 telemetry, autonomous machine control or scientifically validated predictive ML model is claimed.
 
