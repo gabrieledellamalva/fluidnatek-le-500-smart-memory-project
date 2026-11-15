@@ -1,0 +1,73 @@
+{
+  "browser": {
+    "mode": "launch",
+    "executable_path": "/usr/bin/chromium"
+  },
+  "start_url": {
+    "url": "http://127.0.0.1:4173/after/demo.html"
+  },
+  "actions": [
+    {
+      "step_id": "ready",
+      "action": "wait_for",
+      "locator": {
+        "kind": "css",
+        "selector": "label:has-text(\"HV-\") input"
+      },
+      "state": "visible",
+      "timeout_ms": 15000
+    },
+    {
+      "step_id": "clear",
+      "action": "fill",
+      "locator": {
+        "kind": "css",
+        "selector": "label:has-text(\"HV-\") input"
+      },
+      "value": {
+        "source": "literal",
+        "value": ""
+      }
+    },
+    {
+      "step_id": "negative-sign",
+      "action": "press",
+      "locator": {
+        "kind": "css",
+        "selector": "label:has-text(\"HV-\") input"
+      },
+      "key": "-"
+    },
+    {
+      "step_id": "sign-settled",
+      "action": "wait_for_timeout",
+      "duration_ms": 250
+    },
+    {
+      "step_id": "digit",
+      "action": "press",
+      "locator": {
+        "kind": "css",
+        "selector": "label:has-text(\"HV-\") input"
+      },
+      "key": "3"
+    },
+    {
+      "step_id": "commit",
+      "action": "press",
+      "locator": {
+        "kind": "css",
+        "selector": "label:has-text(\"HV-\") input"
+      },
+      "key": "Tab"
+    }
+  ],
+  "capture": {
+    "after_each_step": [
+      "screenshot",
+      "accessibility",
+      "dom",
+      "url"
+    ]
+  }
+}

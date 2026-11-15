@@ -35,22 +35,13 @@ export default function NumericField({
         : String(value)
     );
 
+  const [isEditing, setIsEditing] = useState(false);
+
   useEffect(() => {
-    if (value === undefined) {
-      setDisplayValue("");
-      return;
-    }
-
-    const parsedDisplayValue =
-      parseNumericValue(displayValue);
-
-    if (
-      parsedDisplayValue === undefined ||
-      parsedDisplayValue !== value
-    ) {
-      setDisplayValue(String(value));
-    }
-  }, [value, displayValue]);
+    // A numeric draft may be incomplete ("-", ".", "-."). Keep it while the
+    // operator is editing; the parent intentionally receives undefined then.
+    if (!isEditing) setDisplayValue(value === undefined ? "" : String(value));
+  }, [value, isEditing]);
 
   const handleChange = (
     rawValue: string
@@ -75,6 +66,7 @@ export default function NumericField({
   };
 
   const handleBlur = (): void => {
+    setIsEditing(false);
     const parsedValue =
       parseNumericValue(displayValue);
 
@@ -115,6 +107,7 @@ export default function NumericField({
           onChange={(event) =>
             handleChange(event.target.value)
           }
+          onFocus={() => setIsEditing(true)}
           onBlur={handleBlur}
           className="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 pr-20 text-base font-semibold text-slate-950 outline-none transition placeholder:font-normal placeholder:text-slate-400 focus:border-teal-500 focus:ring-4 focus:ring-teal-100"
         />
