@@ -9,7 +9,7 @@ const origin=`http://127.0.0.1:${port}`;
 let running=false;
 const mime={'.html':'text/html','.js':'text/javascript','.css':'text/css','.json':'application/json','.map':'application/json','.png':'image/png'};
 async function execute(args){
- let command='npm',prefix=['exec','--yes','--package=rea-agents@6.9.0','--','rea'];
+ let command='npm',prefix=['exec','--yes','--package=node@24.22.1','--package=rea-agents@6.9.0','--','rea'];
  if(process.env.REA_ENTRY){command=process.execPath;prefix=[path.resolve(process.env.REA_ENTRY)];}
  return new Promise((resolve,reject)=>{
   const child=spawn(command,[...prefix,...args,'--json'],{cwd:folder,env:process.env,stdio:['ignore','pipe','pipe']});
@@ -41,8 +41,32 @@ async function capture(version,chrome){
  if(final.artifacts.screenshot.state==='captured')await writeFile(path.join(folder,'evidence',`browser-${version}.png`),Buffer.from(final.artifacts.screenshot.value.data_base64,'base64'));
  return {value:Number(match[1]),evidence_id:evidence.evidence_id};
 }
+async function applyLiveFix(prepare) {
+ const source=new URL('../src/components/ui/NumericField.tsx',import.meta.url);
+ const before=await readFile(new URL('./NumericField.before.tsx',import.meta.url),'utf8');
+ const fixed=await readFile(new URL('./NumericField.fixed.tsx',import.meta.url),'utf8');
+ const current=await readFile(source,'utf8');
+ if(current!==before && current!==fixed) throw new Error('The component contains other edits. They were preserved; use a clean demo checkout.');
+ const root=fileURLToPath(new URL('..',import.meta.url));
+ const vite=path.join(root,'node_modules/vite/bin/vite.js');
+ try{await access(vite)}catch{throw new Error('Run npm ci before using the live patch controls.');}
+ await writeFile(source,prepare?before:fixed);
+ try {
+  await new Promise((resolve,reject)=>{
+   const child=spawn(process.execPath,[vite,'build','--config','vite.demo.config.ts','--outDir','demo/site/after'],{cwd:root,env:{...process.env,DEMO_BASELINE:'false'},stdio:['ignore','pipe','pipe']});
+   let log='';child.stdout.on('data',x=>log=(log+x).slice(-8000));child.stderr.on('data',x=>log=(log+x).slice(-8000));child.on('error',reject);child.on('close',code=>code===0?resolve():reject(new Error(log)));
+  });
+ } catch(error) { await writeFile(source,current); throw error; }
+ return {mode:prepare?'original-source-restored':'correction-applied',source:'src/components/ui/NumericField.tsx',rebuilt:true};
+}
 export const handleRequest=async(req,res)=>{
  const send=(code,value)=>{res.writeHead(code,{'Content-Type':'application/json'});res.end(JSON.stringify(value));};
+ if(['/api/prepare-live','/api/apply-fix'].includes(req.url)&&req.method==='POST'){
+  if(req.headers.origin&&req.headers.origin!==origin)return send(403,{error:'Use this local demo origin.'});
+  if(running)return send(409,{error:'Another demo operation is running.'});
+  running=true;
+  try{send(200,await applyLiveFix(req.url==='/api/prepare-live'));}catch(e){send(409,{error:e.message});}finally{running=false;}return;
+ }
  if(req.url==='/api/rea-capture'&&req.method==='POST'){
   if(req.headers.origin&&req.headers.origin!==origin)return send(403,{error:'Use this local demo origin.'});
   if(running)return send(409,{error:'A capture is already running.'});

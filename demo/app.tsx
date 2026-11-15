@@ -10,7 +10,7 @@ const setup:ExperimentalSetup={id:'DEMO-SETUP',projectId:project.id,name:'LE-500
 const baseline=import.meta.env.VITE_DEMO_BASELINE==='true';
 createRoot(document.getElementById('root')!).render(<>
   <div style={{background:baseline?'#78350f':'#065f46',color:'white',padding:'12px 28px',fontSize:13,display:'flex',justifyContent:'space-between'}}>
-    <strong>FLUIDNATEK SMART MEMORY · {baseline?'Original component':'Corrected component'}</strong>
+    <strong>FLUIDNATEK SMART MEMORY · {baseline?'Original component':'Working copy · patch branch'}</strong>
     <span>Offline interview fixture · synthetic data · no machine or cloud connection</span>
   </div>
   <main style={{padding:24,maxWidth:1600,margin:'auto'}}><RunConfig project={project} formulation={formulation} setup={setup} projects={[project]} formulations={[formulation]} characterizations={[]} setups={[setup]} experiments={[]} materials={[]} lang="en" onAddExperiment={async()=>{throw new Error('Saving is disabled in this isolated investigation fixture.')}}/></main>
